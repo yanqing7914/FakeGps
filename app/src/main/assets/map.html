@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>地图</title>
+<link rel="stylesheet" href="leaflet.css">
+<style>
+  html, body, #map { margin: 0; padding: 0; width: 100%; height: 100%; }
+  .leaflet-control-attribution { font-size: 9px; }
+</style>
+</head>
+<body>
+<div id="map" role="application" aria-label="地图，点击选择位置"></div>
+<script src="leaflet.js"></script>
+<script>
+  // 地图上所有坐标都是 GCJ-02（高德瓦片坐标系），与 Android 端约定一致。
+  var map = L.map('map', { zoomControl: true, attributionControl: true })
+              .setView([35.0, 105.0], 4);   // 先显示全国，拿到当前位置后再定位过去
+
+  var layers = {
+    '标准': L.tileLayer('https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}',
+                        { subdomains: '1234', maxZoom: 18, attribution: '© 高德地图' }),
+    '卫星': L.tileLayer('https://webst0{s}.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}',
+                        { subdomains: '1234', maxZoom: 18, attribution: '© 高德地图' })
+  };
+  layers['标准'].addTo(map);
+  L.control.layers(layers, null, { position: 'topright' }).addTo(map);
+
+  var selected = null;     // 选中点
+  var current = null;      // 正在模拟的位置
+  var routeLine = L.polyline([], { color: '#1677ff', weight: 4 }).addTo(map);
+  var routeMarkers = [];
+  var routeMode = false;
+
+  function bridge() { return window.Android; }
+
+  map.on('click', function (e) {
+    var lat = e.latlng.lat, lng = e.latlng.lng;
+    if (routeMode) {
+      addRoutePoint(lat, lng);
+      if (bridge()) bridge().onRoutePointAdded(lat, lng);
+    } else {
+      setSelected(lat, lng, false);
+      if (bridge()) bridge().onMapClick(lat, lng);
+    }
+  });
+
+  function setSelected(lat, lng, pan) {
+    if (selected) selected.setLatLng([lat, lng]);
+    else selected = L.marker([lat, lng], { title: '选中的位置' }).addTo(map);
+    if (pan) map.setView([lat, lng], Math.max(map.getZoom(), 15));
+  }
+
+  function setCurrent(lat, lng, follow) {
+    if (current) current.setLatLng([lat, lng]);
+    else current = L.circleMarker([lat, lng], {
+      radius: 8, color: '#fff', weight: 3, fillColor: '#ff4d4f', fillOpacity: 1
+    }).addTo(map);
+    if (follow) map.panTo([lat, lng], { animate: true });
+  }
+
+  // 手机当前的真实位置（蓝点）
+  var mine = null;
+  function setMyLocation(lat, lng, pan) {
+    if (mine) mine.setLatLng([lat, lng]);
+    else mine = L.circleMarker([lat, lng], {
+      radius: 7, color: '#fff', weight: 3, fillColor: '#1677ff', fillOpacity: 1
+    }).addTo(map).bindTooltip('我的位置');
+    if (pan) map.setView([lat, lng], Math.max(map.getZoom(), 16));
+  }
+
+  function clearCurrent() {
+    if (current) { map.removeLayer(current); current = null; }
+  }
+
+  function setRouteMode(on) {
+    routeMode = on;
+    if (selected && on) { map.removeLayer(selected); selected = null; }
+  }
+
+  function addRoutePoint(lat, lng) {
+    routeLine.addLatLng([lat, lng]);
+    var m = L.circleMarker([lat, lng], {
+      radius: 6, color: '#1677ff', weight: 2, fillColor: '#fff', fillOpacity: 1
+    }).addTo(map);
+    routeMarkers.push(m);
+  }
+
+  function undoRoutePoint() {
+    var pts = routeLine.getLatLngs();
+    if (pts.length === 0) return;
+    pts.pop();
+    routeLine.setLatLngs(pts);
+    map.removeLayer(routeMarkers.pop());
+  }
+
+  function clearRoute() {
+    routeLine.setLatLngs([]);
+    routeMarkers.forEach(function (m) { map.removeLayer(m); });
+    routeMarkers = [];
+  }
+
+  function setRoute(points) {
+    clearRoute();
+    points.forEach(function (p) { addRoutePoint(p[0], p[1]); });
+    if (points.length > 1) map.fitBounds(routeLine.getBounds(), { padding: [40, 40] });
+  }
+
+  if (bridge()) bridge().onMapReady();
+</script>
+</body>
+</html>

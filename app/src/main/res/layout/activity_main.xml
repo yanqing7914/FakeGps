@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
+
+    <!-- 未完成设置时的提示条 -->
+    <LinearLayout
+        android:id="@+id/setupBanner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/warn_bg"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/setupText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@color/warn_text"
+            android:textSize="13sp" />
+
+        <Button
+            android:id="@+id/setupButton"
+            style="@android:style/Widget.Material.Button.Borderless.Colored"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:text="去设置" />
+    </LinearLayout>
+
+    <!-- 地点搜索 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/panel"
+        android:elevation="4dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="12dp"
+        android:paddingEnd="4dp">
+
+        <EditText
+            android:id="@+id/searchInput"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:hint="搜索地点，如 上海外滩"
+            android:imeOptions="actionSearch"
+            android:importantForAutofill="no"
+            android:inputType="text"
+            android:maxLines="1"
+            android:textSize="15sp" />
+
+        <Button
+            android:id="@+id/searchButton"
+            style="@android:style/Widget.Material.Button.Borderless.Colored"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:text="搜索" />
+
+        <Button
+            android:id="@+id/myLocationButton"
+            style="@android:style/Widget.Material.Button.Borderless.Colored"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:contentDescription="回到我的当前位置"
+            android:text="我的位置" />
+    </LinearLayout>
+
+    <WebView
+        android:id="@+id/map"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:contentDescription="地图" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_panel"
+        android:elevation="8dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+            <TextView
+                android:id="@+id/status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:accessibilityLiveRegion="polite"
+                android:text="未运行"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp" />
+
+            <!-- 模式切换 -->
+            <RadioGroup
+                android:id="@+id/modeGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/modeFixed"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:checked="true"
+                    android:text="定点" />
+
+                <RadioButton
+                    android:id="@+id/modeRoute"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="路线" />
+            </RadioGroup>
+
+            <!-- 定点：坐标输入 -->
+            <LinearLayout
+                android:id="@+id/fixedPanel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <EditText
+                        android:id="@+id/coordInput"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:autofillHints=""
+                        android:hint="纬度,经度  如 39.9087,116.3975"
+                        android:importantForAutofill="no"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:textSize="14sp" />
+
+                    <Spinner
+                        android:id="@+id/coordType"
+                        android:layout_width="wrap_content"
+                        android:layout_height="48dp"
+                        android:contentDescription="坐标系" />
+
+                    <Button
+                        android:id="@+id/locateButton"
+                        style="@android:style/Widget.Material.Button.Borderless.Colored"
+                        android:layout_width="wrap_content"
+                        android:layout_height="48dp"
+                        android:text="定位" />
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/favButton"
+                    style="@android:style/Widget.Material.Button.Borderless.Colored"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:text="收藏夹" />
+            </LinearLayout>
+
+            <!-- 路线：编辑与速度 -->
+            <LinearLayout
+                android:id="@+id/routePanel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/routeInfo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="在地图上依次点击添加路线点"
+                    android:textColor="@color/text_primary"
+                    android:textSize="13sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/undoButton"
+                        style="@android:style/Widget.Material.Button.Borderless.Colored"
+                        android:layout_width="wrap_content"
+                        android:layout_height="48dp"
+                        android:text="撤销" />
+
+                    <Button
+                        android:id="@+id/clearButton"
+                        style="@android:style/Widget.Material.Button.Borderless.Colored"
+                        android:layout_width="wrap_content"
+                        android:layout_height="48dp"
+                        android:text="清空" />
+
+                    <Spinner
+                        android:id="@+id/speedSpinner"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:contentDescription="移动速度" />
+
+                    <CheckBox
+                        android:id="@+id/loopCheck"
+                        android:layout_width="wrap_content"
+                        android:layout_height="48dp"
+                        android:checked="true"
+                        android:text="往返" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <CheckBox
+                android:id="@+id/fusedCheck"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:checked="false"
+                android:visibility="gone"
+                android:text="同时接管 fused（融合定位）" />
+
+            <TextView
+                android:id="@+id/readback"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:textColor="@color/text_secondary"
+                android:textSize="11sp" />
+
+            <!-- 操作按钮 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/startButton"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_weight="2"
+                    android:backgroundTint="@color/primary"
+                    android:text="开始模拟"
+                    android:textColor="#FFFFFF" />
+
+                <Button
+                    android:id="@+id/joystickButton"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:text="摇杆" />
+
+                <Button
+                    android:id="@+id/diagButton"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:text="导出日志" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

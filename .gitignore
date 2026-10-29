@@ -1,0 +1,12 @@
+.gradle/
+build/
+local.properties
+*.iml
+.idea/
+
+# 测试和工具产物
+/tmp/
+*.apk
+*.log
+.DS_Store
+.kotlin/
